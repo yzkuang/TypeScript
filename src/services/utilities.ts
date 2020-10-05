@@ -1787,7 +1787,9 @@ namespace ts {
             redirectTargetsMap: program.redirectTargetsMap,
             getProjectReferenceRedirect: fileName => program.getProjectReferenceRedirect(fileName),
             isSourceOfProjectReferenceRedirect: fileName => program.isSourceOfProjectReferenceRedirect(fileName),
-            getCompilerOptions: () => program.getCompilerOptions()
+            getCompilerOptions: () => program.getCompilerOptions(),
+            getPerFileModuleResolutions: () => program.getPerFileModuleResolutions(),
+            getPerFileTypeReferenceResolutions: () => program.getPerFileTypeReferenceResolutions(),
         };
     }
 

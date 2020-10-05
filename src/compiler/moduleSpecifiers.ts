@@ -232,7 +232,7 @@ namespace ts.moduleSpecifiers {
         }
         const links = host.getSymlinkCache
             ? host.getSymlinkCache()
-            : discoverProbableSymlinks(host.getSourceFiles(), getCanonicalFileName, cwd);
+            : discoverProbableSymlinks(host.getSourceFiles(), getCanonicalFileName, cwd, host.getPerFileModuleResolutions());
 
         const symlinkedDirectories = links.getSymlinkedDirectories();
         const useCaseSensitiveFileNames = !host.useCaseSensitiveFileNames || host.useCaseSensitiveFileNames();

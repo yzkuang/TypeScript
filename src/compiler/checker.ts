@@ -304,9 +304,10 @@ namespace ts {
         const getPackagesSet = memoize(() => {
             const set = new Set<string>();
             host.getSourceFiles().forEach(sf => {
-                if (!sf.resolvedModules) return;
+                const resolvedModules = host.getPerFileModuleResolutions().get(sf.resolvedPath);
+                if (!resolvedModules) return;
 
-                forEachEntry(sf.resolvedModules, r => {
+                forEachEntry(resolvedModules, r => {
                     if (r && r.packageId) set.add(r.packageId.name);
                 });
             });
@@ -3232,7 +3233,7 @@ namespace ts {
                 return ambientModule;
             }
             const currentSourceFile = getSourceFileOfNode(location);
-            const resolvedModule = getResolvedModule(currentSourceFile, moduleReference)!; // TODO: GH#18217
+            const resolvedModule = getResolvedModule(host, currentSourceFile, moduleReference)!; // TODO: GH#18217
             const resolutionDiagnostic = resolvedModule && getResolutionDiagnostic(compilerOptions, resolvedModule);
             const sourceFile = resolvedModule && !resolutionDiagnostic && host.getSourceFile(resolvedModule.resolvedFileName);
             if (sourceFile) {
@@ -4345,7 +4346,9 @@ namespace ts {
                         getProjectReferenceRedirect: fileName => host.getProjectReferenceRedirect(fileName),
                         isSourceOfProjectReferenceRedirect: fileName => host.isSourceOfProjectReferenceRedirect(fileName),
                         fileExists: fileName => host.fileExists(fileName),
-                        getCompilerOptions: () => host.getCompilerOptions()
+                        getCompilerOptions: () => host.getCompilerOptions(),
+                        getPerFileModuleResolutions: () => host.getPerFileModuleResolutions(),
+                        getPerFileTypeReferenceResolutions: () => host.getPerFileTypeReferenceResolutions(),
                     } : undefined },
                     encounteredError: false,
                     visitedTypes: undefined,

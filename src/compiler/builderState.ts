@@ -139,8 +139,9 @@ namespace ts {
             }
 
             // Handle type reference directives
-            if (sourceFile.resolvedTypeReferenceDirectiveNames) {
-                sourceFile.resolvedTypeReferenceDirectiveNames.forEach((resolvedTypeReferenceDirective) => {
+            const resolvedTypeReferenceDirectiveNames = program.getPerFileTypeReferenceResolutions().get(sourceFile.resolvedPath);
+            if (resolvedTypeReferenceDirectiveNames) {
+                resolvedTypeReferenceDirectiveNames.forEach((resolvedTypeReferenceDirective) => {
                     if (!resolvedTypeReferenceDirective) {
                         return;
                     }

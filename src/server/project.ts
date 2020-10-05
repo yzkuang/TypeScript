@@ -343,10 +343,12 @@ namespace ts.server {
 
         /*@internal*/
         getSymlinkCache(): SymlinkCache {
-            return this.symlinks || (this.symlinks = discoverProbableSymlinks(
+            return this.symlinks ||= discoverProbableSymlinks(
                 this.program?.getSourceFiles() || emptyArray,
                 this.getCanonicalFileName,
-                this.getCurrentDirectory()));
+                this.getCurrentDirectory(),
+                this.program?.getPerFileModuleResolutions()
+            );
         }
 
         // Method of LanguageServiceHost
@@ -1722,18 +1724,19 @@ namespace ts.server {
     function getUnresolvedImports(program: Program, cachedUnresolvedImportsPerFile: ESMap<Path, readonly string[]>): SortedReadonlyArray<string> {
         const ambientModules = program.getTypeChecker().getAmbientModules().map(mod => stripQuotes(mod.getName()));
         return sortAndDeduplicate(flatMap(program.getSourceFiles(), sourceFile =>
-            extractUnresolvedImportsFromSourceFile(sourceFile, ambientModules, cachedUnresolvedImportsPerFile)));
+            extractUnresolvedImportsFromSourceFile(program, sourceFile, ambientModules, cachedUnresolvedImportsPerFile)));
     }
-    function extractUnresolvedImportsFromSourceFile(file: SourceFile, ambientModules: readonly string[], cachedUnresolvedImportsPerFile: ESMap<Path, readonly string[]>): readonly string[] {
+    function extractUnresolvedImportsFromSourceFile(program: Program, file: SourceFile, ambientModules: readonly string[], cachedUnresolvedImportsPerFile: ESMap<Path, readonly string[]>): readonly string[] {
         return getOrUpdate(cachedUnresolvedImportsPerFile, file.path, () => {
-            if (!file.resolvedModules) return emptyArray;
+            const resolvedModules = program.getPerFileModuleResolutions().get(file.resolvedPath);
+            if (!resolvedModules) return emptyArray;
             let unresolvedImports: string[] | undefined;
-            file.resolvedModules.forEach((resolvedModule, name) => {
+            resolvedModules.forEach((resolvedModule, name) => {
                 // pick unresolved non-relative names
                 if ((!resolvedModule || !resolutionExtensionIsTSOrJson(resolvedModule.extension)) &&
                     !isExternalModuleNameRelative(name) &&
                     !ambientModules.some(m => m === name)) {
-                    unresolvedImports = append(unresolvedImports, parsePackageName(name).packageName);
+                    (unresolvedImports ||= []).push(parsePackageName(name).packageName);
                 }
             });
             return unresolvedImports || emptyArray;

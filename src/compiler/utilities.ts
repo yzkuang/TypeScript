@@ -161,24 +161,8 @@ namespace ts {
         return node.end - node.pos;
     }
 
-    export function getResolvedModule(sourceFile: SourceFile | undefined, moduleNameText: string): ResolvedModuleFull | undefined {
-        return sourceFile && sourceFile.resolvedModules && sourceFile.resolvedModules.get(moduleNameText);
-    }
-
-    export function setResolvedModule(sourceFile: SourceFile, moduleNameText: string, resolvedModule: ResolvedModuleFull): void {
-        if (!sourceFile.resolvedModules) {
-            sourceFile.resolvedModules = new Map<string, ResolvedModuleFull>();
-        }
-
-        sourceFile.resolvedModules.set(moduleNameText, resolvedModule);
-    }
-
-    export function setResolvedTypeReferenceDirective(sourceFile: SourceFile, typeReferenceDirectiveName: string, resolvedTypeReferenceDirective?: ResolvedTypeReferenceDirective): void {
-        if (!sourceFile.resolvedTypeReferenceDirectiveNames) {
-            sourceFile.resolvedTypeReferenceDirectiveNames = new Map<string, ResolvedTypeReferenceDirective | undefined>();
-        }
-
-        sourceFile.resolvedTypeReferenceDirectiveNames.set(typeReferenceDirectiveName, resolvedTypeReferenceDirective);
+    export function getResolvedModule(host: Pick<ModuleSpecifierResolutionHost, "getPerFileModuleResolutions">, sourceFile: SourceFile | undefined, moduleNameText: string): ResolvedModuleFull | undefined {
+        return sourceFile && host.getPerFileModuleResolutions().get(sourceFile.resolvedPath)?.get(moduleNameText);
     }
 
     export function projectReferenceIsEqualTo(oldRef: ProjectReference, newRef: ProjectReference) {
@@ -6057,11 +6041,13 @@ namespace ts {
         };
     }
 
-    export function discoverProbableSymlinks(files: readonly SourceFile[], getCanonicalFileName: GetCanonicalFileName, cwd: string): SymlinkCache {
+    export function discoverProbableSymlinks(files: readonly SourceFile[], getCanonicalFileName: GetCanonicalFileName, cwd: string, perFileModuleResolutions: ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedModuleFull>> | undefined): SymlinkCache {
         const cache = createSymlinkCache();
-        const symlinks = flatten<readonly [string, string]>(mapDefined(files, sf =>
-            sf.resolvedModules && compact(arrayFrom(mapIterator(sf.resolvedModules.values(), res =>
-                res && res.originalPath && res.resolvedFileName !== res.originalPath ? [res.resolvedFileName, res.originalPath] as const : undefined)))));
+        const symlinks = flatten<readonly [string, string]>(mapDefined(files, sf => {
+            const resolvedModules = perFileModuleResolutions?.get(sf.resolvedPath);
+            return resolvedModules && compact(arrayFrom(mapIterator(resolvedModules.values(), res =>
+                res && res.originalPath && res.resolvedFileName !== res.originalPath ? [res.resolvedFileName, res.originalPath] as const : undefined)));
+        }));
         for (const [resolvedPath, originalPath] of symlinks) {
             const [commonResolved, commonOriginal] = guessDirectorySymlink(resolvedPath, originalPath, cwd, getCanonicalFileName) || emptyArray;
             if (commonResolved && commonOriginal) {

@@ -772,6 +772,8 @@ namespace ts {
             getResolvedProjectReferenceToRedirect: returnUndefined,
             getProjectReferenceRedirect: returnUndefined,
             isSourceOfProjectReferenceRedirect: returnFalse,
+            getPerFileModuleResolutions: notImplemented,
+            getPerFileTypeReferenceResolutions: notImplemented,
             writeFile: (name, text, writeByteOrderMark) => {
                 switch (name) {
                     case jsFilePath:

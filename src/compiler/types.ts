@@ -3486,11 +3486,6 @@ namespace ts {
         /* @internal */ classifiableNames?: ReadonlySet<__String>;
         // Comments containing @ts-* directives, in order.
         /* @internal */ commentDirectives?: CommentDirective[];
-        // Stores a mapping 'external module reference text' -> 'resolved file name' | undefined
-        // It is used to resolve module names in the checker.
-        // Content of this field should never be used directly - use getResolvedModuleFileName/setResolvedModuleFileName functions instead
-        /* @internal */ resolvedModules?: ESMap<string, ResolvedModuleFull | undefined>;
-        /* @internal */ resolvedTypeReferenceDirectiveNames: ESMap<string, ResolvedTypeReferenceDirective | undefined>;
         /* @internal */ imports: readonly StringLiteralLike[];
         // Identifier only if `declare global`
         /* @internal */ moduleAugmentations: readonly (StringLiteral | Identifier)[];
@@ -3809,6 +3804,9 @@ namespace ts {
          * This implementation handles file exists to be true if file is source of project reference redirect when program is created using useSourceOfProjectReferenceRedirect
          */
         /*@internal*/ fileExists(fileName: string): boolean;
+
+        /*@internal*/ getPerFileModuleResolutions(): ESMap<Path, ESMap<string, ResolvedModuleFull>>;
+        /*@internal*/ getPerFileTypeReferenceResolutions(): ESMap<Path, ESMap<string,ResolvedTypeReferenceDirective | undefined>>;
     }
 
     /*@internal*/
@@ -7857,6 +7855,10 @@ namespace ts {
         getProjectReferenceRedirect(fileName: string): string | undefined;
         isSourceOfProjectReferenceRedirect(fileName: string): boolean;
         getCompilerOptions(): CompilerOptions;
+
+        getPerFileModuleResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedModuleFull>>;
+        getPerFileTypeReferenceResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedTypeReferenceDirective | undefined>>;
+
     }
 
     // Note: this used to be deprecated in our public API, but is still used internally

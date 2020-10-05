@@ -1837,7 +1837,9 @@ namespace ts.projectSystem {
         const appPath = "/a/b/app.js" as Path;
         const foooPath = "/a/b/node_modules/fooo/index.d.ts";
         function verifyResolvedModuleOfFooo(project: server.Project) {
-            const foooResolution = project.getLanguageService().getProgram()!.getSourceFileByPath(appPath)!.resolvedModules!.get("fooo")!;
+            const program = project.getLanguageService().getProgram()!;
+            const sourceFile = program.getSourceFileByPath(appPath)!;
+            const foooResolution = program.getPerFileModuleResolutions().get(sourceFile.resolvedPath)!.get("fooo")!;
             assert.equal(foooResolution.resolvedFileName, foooPath);
             return foooResolution;
         }

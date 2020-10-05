@@ -8,7 +8,7 @@ namespace ts.codefix {
                 const moduleExportsChangedToDefault = convertFileToEs6Module(sourceFile, program.getTypeChecker(), changes, program.getCompilerOptions().target!, getQuotePreference(sourceFile, preferences));
                 if (moduleExportsChangedToDefault) {
                     for (const importingFile of program.getSourceFiles()) {
-                        fixImportOfModuleExports(importingFile, sourceFile, changes, getQuotePreference(importingFile, preferences));
+                        fixImportOfModuleExports(program, importingFile, sourceFile, changes, getQuotePreference(importingFile, preferences));
                     }
                 }
             });
@@ -17,9 +17,9 @@ namespace ts.codefix {
         },
     });
 
-    function fixImportOfModuleExports(importingFile: SourceFile, exportingFile: SourceFile, changes: textChanges.ChangeTracker, quotePreference: QuotePreference) {
+    function fixImportOfModuleExports(program: Program, importingFile: SourceFile, exportingFile: SourceFile, changes: textChanges.ChangeTracker, quotePreference: QuotePreference) {
         for (const moduleSpecifier of importingFile.imports) {
-            const imported = getResolvedModule(importingFile, moduleSpecifier.text);
+            const imported = getResolvedModule(program, importingFile, moduleSpecifier.text);
             if (!imported || imported.resolvedFileName !== exportingFile.fileName) {
                 continue;
             }

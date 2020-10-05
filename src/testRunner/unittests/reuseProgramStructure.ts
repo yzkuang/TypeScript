@@ -203,11 +203,11 @@ namespace ts {
     }
 
     function checkResolvedModulesCache(program: Program, fileName: string, expectedContent: ESMap<string, ResolvedModule | undefined> | undefined): void {
-        checkCache("resolved modules", program, fileName, expectedContent, f => f.resolvedModules, checkResolvedModule);
+        checkCache("resolved modules", program, fileName, expectedContent, f => program.getPerFileModuleResolutions().get(f.resolvedPath), checkResolvedModule);
     }
 
     function checkResolvedTypeDirectivesCache(program: Program, fileName: string, expectedContent: ESMap<string, ResolvedTypeReferenceDirective> | undefined): void {
-        checkCache("resolved type directives", program, fileName, expectedContent, f => f.resolvedTypeReferenceDirectiveNames, checkResolvedTypeDirective);
+        checkCache("resolved type directives", program, fileName, expectedContent, f => program.getPerFileTypeReferenceResolutions().get(f.resolvedPath), checkResolvedTypeDirective);
     }
 
     describe("unittests:: Reuse program structure:: General", () => {
@@ -383,7 +383,8 @@ namespace ts {
             const program2 = updateProgram(program1, ["/a.ts"], options, files => {
                 files[0].text = files[0].text.updateProgram('import * as aa from "a";');
             });
-            assert.isDefined(program2.getSourceFile("/a.ts")!.resolvedModules!.get("a"), "'a' is not an unresolved module after re-use");
+            const sourceFile = program2.getSourceFile("/a.ts")!;
+            assert.isDefined(program2.getPerFileModuleResolutions().get(sourceFile.resolvedPath)!.get("a"), "'a' is not an unresolved module after re-use");
         });
 
         it("works with updated SourceFiles", () => {
@@ -406,7 +407,8 @@ namespace ts {
                 }
             };
             const program2 = createProgram(["/a.ts"], options, updateHost, program1);
-            assert.isDefined(program2.getSourceFile("/a.ts")!.resolvedModules!.get("a"), "'a' is not an unresolved module after re-use");
+            const sourceFile2 = program2.getSourceFile("/a.ts")!;
+            assert.isDefined(program2.getPerFileModuleResolutions().get(sourceFile2.resolvedPath)!.get("a"), "'a' is not an unresolved module after re-use");
             assert.strictEqual(sourceFile.statements[2].getSourceFile(), sourceFile, "parent pointers are not altered");
         });
 
