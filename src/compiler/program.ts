@@ -1224,7 +1224,7 @@ namespace ts {
             let reusedNames: string[] | undefined;
             /** A transient placeholder used to mark predicted resolution in the result list. */
             const predictedToResolveToAmbientModuleMarker: ResolvedModuleWithFailedLookupLocations = <any>{};
-            const oldSourceFile = oldProgram?.getSourceFile(file.path);
+            const oldSourceFile = oldProgram?.getSourceFileByPath(file.resolvedPath);
 
             for (let i = 0; i < moduleNames.length; i++) {
                 const moduleName = moduleNames[i];
@@ -1305,7 +1305,7 @@ namespace ts {
             // we should adjust the value returned here.
             function moduleNameResolvesToAmbientModuleInNonModifiedFile(moduleName: string): boolean {
                 const resolutionToFile = oldProgram?.getPerFileModuleResolutions().get(file.resolvedPath)?.get(moduleName)?.resolvedModule;
-                const resolvedFile = resolutionToFile && oldProgram!.getSourceFile(resolutionToFile.resolvedFileName);
+                const resolvedFile = resolutionToFile && oldProgram!.getSourceFileByPath(toPath(resolutionToFile.resolvedFileName));
                 if (resolutionToFile && resolvedFile) {
                     // In the old program, we resolved to an ambient module that was in the same
                     //   place as we expected to find an actual module file.
@@ -1337,7 +1337,7 @@ namespace ts {
                     const newResolvedRef = parseProjectReferenceConfigFile(newRef);
                     if (oldResolvedRef) {
                         // Resolved project reference has gone missing or changed
-                        return !newResolvedRef || newResolvedRef.sourceFile !== oldResolvedRef.sourceFile;
+                        return !newResolvedRef || newResolvedRef.sourceFile.version !== oldResolvedRef.sourceFile.version;
                     }
                     else {
                         // A previously-unresolved reference may be resolved now
@@ -1413,7 +1413,7 @@ namespace ts {
                 if (oldSourceFile.redirectInfo) {
                     // We got `newSourceFile` by path, so it is actually for the unredirected file.
                     // This lets us know if the unredirected file has changed. If it has we should break the redirect.
-                    if (newSourceFile !== oldSourceFile.redirectInfo.unredirected) {
+                    if (newSourceFile.version !== oldSourceFile.redirectInfo.unredirected.version) {
                         // Underlying file has changed. Might not redirect anymore. Must rebuild program.
                         return StructureIsReused.Not;
                     }
@@ -1428,7 +1428,7 @@ namespace ts {
                     fileChanged = false;
                 }
                 else {
-                    fileChanged = newSourceFile !== oldSourceFile;
+                    fileChanged = newSourceFile.version !== oldSourceFile.version;
                 }
 
                 // Since the project references havent changed, its right to set originalFileName and resolvedPath here
@@ -1559,6 +1559,8 @@ namespace ts {
             Debug.assert(newSourceFiles.length === oldProgram.getSourceFiles().length);
             for (const newSourceFile of newSourceFiles) {
                 filesByName.set(newSourceFile.path, newSourceFile);
+                // Ensure imports are calculated if the file version didnt change so but its different instance of file
+                collectExternalModuleReferences(newSourceFile);
             }
             const oldFilesByNameMap = oldProgram.getFilesByNameMap();
             oldFilesByNameMap.forEach((oldFile, path) => {
