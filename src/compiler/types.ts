@@ -3717,7 +3717,7 @@ namespace ts {
         /* @internal */
         getRefFileMap(): MultiMap<Path, RefFile> | undefined;
         /* @internal */
-        getFilesByNameMap(): ESMap<string, SourceFile | false | 0>;
+        getFilesByNameMap(): ESMap<Path, SourceFile | false | 0>;
 
         /**
          * Emits the JavaScript and declaration files.  If targetSourceFile is not specified, then
@@ -3773,6 +3773,7 @@ namespace ts {
         /* @internal */ getFileProcessingDiagnostics(): DiagnosticCollection;
         /* @internal */ getResolvedTypeReferenceDirectives(): ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>;
         isSourceFileFromExternalLibrary(file: SourceFile): boolean;
+        /* @internal */ isSourceFileFromExternalLibraryPath(path: Path): boolean;
         isSourceFileDefaultLibrary(file: SourceFile): boolean;
 
         // For testing purposes only.
@@ -3809,6 +3810,78 @@ namespace ts {
 
     /*@internal*/
     export interface Program extends TypeCheckerHost, ModuleSpecifierResolutionHost {
+    }
+
+    /* @internal */
+    export interface RedirectInfoOfProgramFromBuildInfo {
+        readonly redirectTarget: Pick<SourceFile, "path">;
+    }
+
+    /* @internal */
+    export interface ResolvedProjectReferenceOfProgramFromBuildInfo {
+        commandLine: Pick<ParsedCommandLine, "projectReferences">;
+        sourceFile: Pick<SourceFile, "version" | "path">;
+        references?: readonly (ResolvedProjectReferenceOfProgramFromBuildInfo | undefined)[];
+    }
+
+    /*@internal*/
+    export interface IdentifierOfProgramFromBuildInfo {
+        kind: SyntaxKind.Identifier;
+        escapedText: string;
+    }
+
+    /*@internal*/
+    export interface StringLiteralLikeOfProgramFromBuildInfo {
+        kind: SyntaxKind.StringLiteral | SyntaxKind.NoSubstitutionTemplateLiteral;
+        text: string;
+        escapedText: string;
+    }
+
+    /*@internal*/
+    export type ModuleNameOfProgramFromBuildInfo = IdentifierOfProgramFromBuildInfo | StringLiteralLikeOfProgramFromBuildInfo;
+
+    /*@internal*/
+    export interface SourceFileOfProgramFromBuildInfo {
+        fileName: string;
+        originalFileName: string;
+        path: Path;
+        resolvedPath: Path;
+        flags: NodeFlags;
+        version: string;
+
+        typeReferenceDirectives: readonly string[];
+        libReferenceDirectives: readonly string[];
+        referencedFiles: readonly string[];
+        imports: readonly StringLiteralLikeOfProgramFromBuildInfo[];
+        moduleAugmentations: ModuleNameOfProgramFromBuildInfo[];
+        ambientModuleNames: readonly string[];
+        hasNoDefaultLib: boolean;
+
+        redirectInfo?: RedirectInfoOfProgramFromBuildInfo;
+    }
+
+    /*@internal*/
+    export interface ProgramFromBuildInfo {
+        programFromBuildInfo: true;
+
+        getCompilerOptions(): CompilerOptions;
+        getRootFileNames(): readonly string[];
+        getSourceFiles(): SourceFileOfProgramFromBuildInfo[];
+        getSourceFileByPath(path: Path): SourceFileOfProgramFromBuildInfo | undefined;
+        getPerFileModuleResolutions(): ESMap<Path, ESMap<string, ResolvedModuleWithFailedLookupLocations>>;
+        getPerFileTypeReferenceResolutions(): ESMap<Path, ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>>;
+        getProjectReferences(): readonly ProjectReference[] | undefined;
+        getResolvedProjectReferences(): readonly ResolvedProjectReferenceOfProgramFromBuildInfo[] | undefined;
+        getMissingFilePaths(): readonly Path[];
+        getRefFileMap(): MultiMap<Path, RefFile> | undefined;
+        getResolvedTypeReferenceDirectives(): ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>;
+        getFilesByNameMap(): ESMap<Path, Path | false | 0>;
+        isSourceFileFromExternalLibraryPath(path: Path): boolean;
+        getFileProcessingDiagnostics(): readonly ReusableDiagnostic[];
+
+        redirectTargetsMap: MultiMap<string, string>;
+        sourceFileToPackageName: ESMap<string, string>;
+        structureIsReused?: StructureIsReused;
     }
 
     /* @internal */
@@ -5990,6 +6063,9 @@ namespace ts {
     }
 
     /* @internal */
+    export type CreateProgramOptionsWithProgramFromBuildInfo = Omit<CreateProgramOptions, "oldProgram"> & { oldProgram: ProgramFromBuildInfo; };
+
+    /* @internal */
     export interface CommandLineOptionBase {
         name: string;
         type: "string" | "number" | "boolean" | "object" | "list" | ESMap<string, number | string>;    // a value of a primitive type, or an object literal mapping named values to actual values
@@ -7857,7 +7933,6 @@ namespace ts {
 
         getPerFileModuleResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedModuleWithFailedLookupLocations>>;
         getPerFileTypeReferenceResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>>;
-
     }
 
     // Note: this used to be deprecated in our public API, but is still used internally

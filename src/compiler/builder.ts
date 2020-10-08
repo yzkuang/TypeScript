@@ -261,7 +261,8 @@ namespace ts {
         return state;
     }
 
-    function convertToDiagnostics(diagnostics: readonly ReusableDiagnostic[], newProgram: Program, getCanonicalFileName: GetCanonicalFileName): readonly Diagnostic[] {
+    export type ConvertToDiagnosticsProgram = Pick<Program, "getCompilerOptions" | "getCurrentDirectory" | "getSourceFileByPath">;
+    export function convertToDiagnostics(diagnostics: readonly ReusableDiagnostic[], newProgram: ConvertToDiagnosticsProgram, getCanonicalFileName: GetCanonicalFileName): readonly Diagnostic[] {
         if (!diagnostics.length) return emptyArray;
         const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(newProgram.getCompilerOptions())!, newProgram.getCurrentDirectory()));
         return diagnostics.map(diagnostic => {
@@ -284,7 +285,7 @@ namespace ts {
         }
     }
 
-    function convertToDiagnosticRelatedInformation(diagnostic: ReusableDiagnosticRelatedInformation, newProgram: Program, toPath: (path: string) => Path): DiagnosticRelatedInformation {
+    function convertToDiagnosticRelatedInformation(diagnostic: ReusableDiagnosticRelatedInformation, newProgram: ConvertToDiagnosticsProgram, toPath: (path: string) => Path): DiagnosticRelatedInformation {
         const { file } = diagnostic;
         return {
             ...diagnostic,
