@@ -3717,7 +3717,7 @@ namespace ts {
         /* @internal */
         getRefFileMap(): MultiMap<Path, RefFile> | undefined;
         /* @internal */
-        getFilesByNameMap(): ESMap<string, SourceFile | false | undefined>;
+        getFilesByNameMap(): ESMap<string, SourceFile | false | 0>;
 
         /**
          * Emits the JavaScript and declaration files.  If targetSourceFile is not specified, then
