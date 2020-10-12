@@ -1451,4 +1451,94 @@ const a: string = "hello";`),
             ]
         });
     });
+
+    function getPersistentResolutionsFiles(outFile?: string) {
+        return createWatchedSystem([
+            {
+                path: `${projectRoot}/src/main.ts`,
+                content: Utils.dedent`
+                        import { something } from "./filePresent";
+                        import { something2 } from "./fileNotFound";`,
+            },
+            {
+                path: `${projectRoot}/src/filePresent.ts`,
+                content: `export function something() { return 10; }`,
+            },
+            {
+                path: `${projectRoot}/tsconfig.json`,
+                content: JSON.stringify({
+                    compilerOptions: {
+                        module: "amd",
+                        composite: true,
+                        persistResolutions: true,
+                        traceResolution: true,
+                        outFile
+                    },
+                    include: ["src/**/*.ts"]
+                }),
+            },
+            libFile
+        ], { currentDirectory: projectRoot });
+    }
+
+    function getPersistentResoluitionsFilesWith(modify: (sys: WatchedSystem) => void, outFile?: string) {
+        const sys = getPersistentResolutionsFiles(outFile);
+        const exit = sys.exit;
+        const readFile = sys.readFile;
+        const writeFile = sys.writeFile;
+        fakes.patchHostForBuildInfoReadWrite(sys);
+        sys.exit = noop;
+        modify(sys);
+        sys.exit = exit;
+        sys.readFile = readFile;
+        sys.writeFile = writeFile;
+        sys.clearOutput();
+        return sys;
+    }
+
+    function verifyTscWatchPersistentResolutionsWorker(subScenario: string, input: "--p" | "--b", sys: () => WatchedSystem) {
+        verifyTscWatch({
+            scenario: "persistResolutions",
+            subScenario,
+            sys,
+            commandLineArgs: [input, ".", "-w", "--extendedDiagnostics"],
+            changes: [
+                {
+                    caption: "Modify main file",
+                    change: sys => sys.appendFile(`${projectRoot}/src/main.ts`, `something();`),
+                    timeouts: runQueuedTimeoutCallbacks,
+                },
+                {
+                    caption: "Add new module and update main file",
+                    change: sys => {
+                        sys.writeFile(`${projectRoot}/src/newFile.ts`, "export function foo() { return 20; }");
+                        sys.prependFile(`${projectRoot}/src/main.ts`, `import { foo } from "./newFile";`);
+                    },
+                    timeouts: runQueuedTimeoutCallbacks,
+                },
+                {
+                    caption: "Write file that could not be resolved",
+                    change: sys => sys.writeFile(`${projectRoot}/src/fileNotFound.ts`, "export function something2() { return 20; }"),
+                    timeouts: sys => {
+                        sys.runQueuedTimeoutCallbacks(); // Invalidate resolutions
+                        sys.runQueuedTimeoutCallbacks(); // Actual update
+                    }
+                }
+            ]
+        });
+    }
+
+    export function verifyTscWatchPersistentResolutions(input: "--p" | "--b", outFile?: string) {
+        verifyTscWatchPersistentResolutionsWorker(`saves resolution and uses it for new program${outFile ? " with outFile" : ""}`, input, () => getPersistentResolutionsFiles(outFile));
+        verifyTscWatchPersistentResolutionsWorker(`can build after resolutions have been saved in tsbuildinfo file${outFile ? " with outFile" : ""}`, input, () => getPersistentResoluitionsFilesWith(sys => executeCommandLine(sys, noop, [input, "."]), outFile));
+        verifyTscWatchPersistentResolutionsWorker(`can build after resolutions are cleaned${outFile ? " with outFile" : ""}`, input, () => getPersistentResoluitionsFilesWith(sys => {
+            executeCommandLine(sys, noop, [input, "."]);
+            executeCommandLine(sys, noop, [input, ".", "--cleanResolutions"]);
+        }, outFile));
+    }
+
+    describe("unittests:: tsbuild:: watchMode:: persistentResolutions", () => {
+        verifyTscWatchPersistentResolutions("--b");
+        verifyTscWatchPersistentResolutions("--b", "outFile.js");
+    });
 }

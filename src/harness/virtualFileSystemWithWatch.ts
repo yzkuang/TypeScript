@@ -1015,6 +1015,10 @@ interface Array<T> { length: number; [n: number]: T; }`
             this.modifyFile(path, this.readFile(path) + content, options);
         }
 
+        prependFile(path: string, content: string, options?: Partial<ReloadWatchInvokeOptions>): void {
+            this.modifyFile(path, content + this.readFile(path), options);
+        }
+
         write(message: string) {
             this.output.push(message);
         }
