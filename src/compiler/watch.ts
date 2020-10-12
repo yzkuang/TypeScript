@@ -233,6 +233,29 @@ namespace ts {
         return ExitStatus.Success;
     }
 
+    export interface CleanResolutionsOfTsBuildInfoAndReportErrorHost extends CleanResolutionsOfTsBuildInfoHost {
+        getCurrentDirectory(): string;
+    }
+    export function cleanResolutionsOfTsBuildInfoAndReportError(
+        options: CompilerOptions,
+        host: CleanResolutionsOfTsBuildInfoAndReportErrorHost,
+        reportDiagnostic: DiagnosticReporter,
+        writeFileName?: (s: string) => void,
+        reportSummary?: ReportEmitErrorSummary,
+    ): number {
+        const { emittedFiles, diagnostics } = cleanResolutionsOfTsBuildInfo(options, host);
+        diagnostics.forEach(reportDiagnostic);
+        if (writeFileName) {
+            const currentDir = host.getCurrentDirectory();
+            forEach(emittedFiles, file => {
+                const filepath = getNormalizedAbsolutePath(file, currentDir);
+                writeFileName(`TSFILE: ${filepath}`);
+            });
+        }
+        reportSummary?.(diagnostics.length);
+        return diagnostics.length;
+    }
+
     export const noopFileWatcher: FileWatcher = { close: noop };
     export const returnNoopFileWatcher = () => noopFileWatcher;
 
