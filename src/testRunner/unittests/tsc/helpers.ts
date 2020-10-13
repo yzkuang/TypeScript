@@ -105,6 +105,7 @@ namespace ts {
         sys.write(`${sys.getExecutingFilePath()} ${commandLineArgs.join(" ")}\n`);
         sys.exit = exitCode => sys.exitCode = exitCode;
         const { cb, getPrograms } = commandLineCallbacks(sys, originalReadFile);
+        debugger;
         executeCommandLine(
             sys,
             cb,

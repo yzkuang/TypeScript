@@ -1287,7 +1287,7 @@ namespace ts {
         buildResult: BuildResultFlags,
         errorType: string,
     ) {
-        const canEmitBuildInfo = !(buildResult & BuildResultFlags.SyntaxErrors) && program && !outFile(program.getCompilerOptions());
+        const canEmitBuildInfo = !(buildResult & BuildResultFlags.SyntaxErrors) && program && !outFileWithoutPersistResolutions(program.getCompilerOptions());
 
         reportAndStoreErrors(state, resolvedPath, diagnostics);
         // List files if any other build error using program (emit errors already report files)
