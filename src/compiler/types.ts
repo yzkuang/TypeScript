@@ -3789,8 +3789,6 @@ namespace ts {
         /** Is the file emitted file */
         /* @internal */ isEmittedFile(file: string): boolean;
 
-        /* @internal */ getResolvedModuleWithFailedLookupLocationsFromCache(moduleName: string, containingFile: string): ResolvedModuleWithFailedLookupLocations | undefined;
-
         getProjectReferences(): readonly ProjectReference[] | undefined;
         getResolvedProjectReferences(): readonly (ResolvedProjectReference | undefined)[] | undefined;
         /*@internal*/ getProjectReferenceRedirect(fileName: string): string | undefined;
@@ -3805,8 +3803,8 @@ namespace ts {
          */
         /*@internal*/ fileExists(fileName: string): boolean;
 
-        /*@internal*/ getPerFileModuleResolutions(): ESMap<Path, ESMap<string, ResolvedModuleFull>>;
-        /*@internal*/ getPerFileTypeReferenceResolutions(): ESMap<Path, ESMap<string,ResolvedTypeReferenceDirective | undefined>>;
+        /*@internal*/ getPerFileModuleResolutions(): ESMap<Path, ESMap<string, ResolvedModuleWithFailedLookupLocations>>;
+        /*@internal*/ getPerFileTypeReferenceResolutions(): ESMap<Path, ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>>;
     }
 
     /*@internal*/
@@ -6306,11 +6304,11 @@ namespace ts {
          * If resolveModuleNames is implemented then implementation for members from ModuleResolutionHost can be just
          * 'throw new Error("NotImplemented")'
          */
-        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedModule | undefined)[];
+        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedModuleWithFailedLookupLocations[] | (ResolvedModule | undefined)[];
         /**
          * This method is a companion for 'resolveModuleNames' and is used to resolve 'types' references to actual type declaration files
          */
-        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedTypeReferenceDirective | undefined)[];
+        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedTypeReferenceDirectiveWithFailedLookupLocations[] | (ResolvedTypeReferenceDirective | undefined)[];
         getEnvironmentVariable?(name: string): string | undefined;
         /* @internal */ onReleaseOldSourceFile?(oldSourceFile: SourceFile, oldOptions: CompilerOptions, hasSourceFileByPath: boolean): void;
         /* @internal */ hasInvalidatedResolution?: HasInvalidatedResolution;
@@ -7856,8 +7854,8 @@ namespace ts {
         isSourceOfProjectReferenceRedirect(fileName: string): boolean;
         getCompilerOptions(): CompilerOptions;
 
-        getPerFileModuleResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedModuleFull>>;
-        getPerFileTypeReferenceResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedTypeReferenceDirective | undefined>>;
+        getPerFileModuleResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedModuleWithFailedLookupLocations>>;
+        getPerFileTypeReferenceResolutions(): ReadonlyESMap<Path, ReadonlyESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>>;
 
     }
 

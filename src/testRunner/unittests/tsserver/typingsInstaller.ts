@@ -1840,7 +1840,7 @@ namespace ts.projectSystem {
             const program = project.getLanguageService().getProgram()!;
             const sourceFile = program.getSourceFileByPath(appPath)!;
             const foooResolution = program.getPerFileModuleResolutions().get(sourceFile.resolvedPath)!.get("fooo")!;
-            assert.equal(foooResolution.resolvedFileName, foooPath);
+            assert.equal(foooResolution.resolvedModule!.resolvedFileName, foooPath);
             return foooResolution;
         }
 
