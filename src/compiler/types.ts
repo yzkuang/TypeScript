@@ -3786,7 +3786,7 @@ namespace ts {
         /** Given a source file, get the name of the package it was imported from. */
         /* @internal */ sourceFileToPackageName: ESMap<string, string>;
         /** Set of all source files that some other source file redirects to. */
-        /* @internal */ redirectTargetsMap: MultiMap<string, string>;
+        /* @internal */ redirectTargetsMap: MultiMap<Path, string>;
         /** Is the file emitted file */
         /* @internal */ isEmittedFile(file: string): boolean;
 
@@ -3879,13 +3879,13 @@ namespace ts {
         isSourceFileFromExternalLibraryPath(path: Path): boolean;
         getFileProcessingDiagnostics(): readonly ReusableDiagnostic[];
 
-        redirectTargetsMap: MultiMap<string, string>;
+        redirectTargetsMap: MultiMap<Path, string>;
         sourceFileToPackageName: ESMap<string, string>;
         structureIsReused?: StructureIsReused;
     }
 
     /* @internal */
-    export type RedirectTargetsMap = ReadonlyESMap<string, readonly string[]>;
+    export type RedirectTargetsMap = ReadonlyESMap<Path, readonly string[]>;
 
     export interface ResolvedProjectReference {
         commandLine: ParsedCommandLine;
