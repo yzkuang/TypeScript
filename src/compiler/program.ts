@@ -1602,10 +1602,10 @@ namespace ts {
             Debug.assert(newSourceFiles.length === oldProgram.getSourceFiles().length);
             newSourceFiles.forEach((newSourceFile, index) => {
                 // Update file if its redirecting to different file
-                const oldSourceFile = oldProgram!.getSourceFiles()[index];
+                const oldSourceFile = oldProgram.getSourceFiles()[index];
                 if (oldSourceFile.redirectInfo) {
                     const newRedirectTarget = filesByName.get(oldSourceFile.redirectInfo.redirectTarget.path) as SourceFile;
-                    newSourceFile = !isProgramFromBuildInfo(oldProgram!) && newRedirectTarget === oldSourceFile.redirectInfo.redirectTarget ?
+                    newSourceFile = !isProgramFromBuildInfo(oldProgram) && newRedirectTarget === oldSourceFile.redirectInfo.redirectTarget ?
                         oldSourceFile as SourceFile :
                         // Create new redirect file
                         createRedirectSourceFile(newRedirectTarget, newSourceFile, oldSourceFile.fileName, oldSourceFile.path, oldSourceFile.resolvedPath, oldSourceFile.originalFileName);
@@ -1625,7 +1625,7 @@ namespace ts {
                 const oldPath = !isString(oldFile) ? oldFile.path : oldFile;
                 if (oldPath === path) {
                     // Set the file as found during node modules search if it was found that way in old progra,
-                    if (oldProgram!.isSourceFileFromExternalLibraryPath(oldPath)) {
+                    if (oldProgram.isSourceFileFromExternalLibraryPath(oldPath)) {
                         sourceFilesFoundSearchingNodeModules.set(oldPath, true);
                     }
                     return;
