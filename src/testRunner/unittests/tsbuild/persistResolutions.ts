@@ -44,7 +44,7 @@ namespace ts {
                     subScenario: "Clean resolutions",
                     buildKind: BuildKind.IncrementalDtsChange,
                     modifyFs: noop,
-                    commandLineArgs: [input, "src/project", "--cleanResolutions"]
+                    commandLineArgs: [input, "src/project", "--cleanPersistedProgram"]
                 },
                 noChangeRun,
                 {

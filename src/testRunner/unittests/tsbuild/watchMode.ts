@@ -1533,7 +1533,7 @@ const a: string = "hello";`),
         verifyTscWatchPersistentResolutionsWorker(`can build after resolutions have been saved in tsbuildinfo file${outFile ? " with outFile" : ""}`, input, () => getPersistentResoluitionsFilesWith(sys => executeCommandLine(sys, noop, [input, "."]), outFile));
         verifyTscWatchPersistentResolutionsWorker(`can build after resolutions are cleaned${outFile ? " with outFile" : ""}`, input, () => getPersistentResoluitionsFilesWith(sys => {
             executeCommandLine(sys, noop, [input, "."]);
-            executeCommandLine(sys, noop, [input, ".", "--cleanResolutions"]);
+            executeCommandLine(sys, noop, [input, ".", "--cleanPersistedProgram"]);
         }, outFile));
     }
 
