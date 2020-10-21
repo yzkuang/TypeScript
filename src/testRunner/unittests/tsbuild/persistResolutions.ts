@@ -5,8 +5,12 @@ namespace ts {
             subScenario: `saves resolution and uses it for new program${outFile ? " with outFile" : ""}`,
             fs: () => loadProjectFromFiles({
                 "/src/project/src/main.ts": Utils.dedent`
-                        import { something } from "./filePresent";
-                        import { something2 } from "./fileNotFound";`,
+                    import { something } from "./filePresent";
+                    import { something as something1 } from "./filePresent";
+                    import { something2 } from "./fileNotFound";`,
+                "/src/project/src/anotherFileReusingResolution.ts": Utils.dedent`
+                    import { something } from "./filePresent";
+                    import { something2 } from "./fileNotFound";`,
                 "/src/project/src/filePresent.ts": `export function something() { return 10; }`,
                 "/src/project/tsconfig.json": JSON.stringify({
                     compilerOptions: {

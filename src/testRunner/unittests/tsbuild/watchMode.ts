@@ -1457,8 +1457,15 @@ const a: string = "hello";`),
             {
                 path: `${projectRoot}/src/main.ts`,
                 content: Utils.dedent`
-                        import { something } from "./filePresent";
-                        import { something2 } from "./fileNotFound";`,
+                    import { something } from "./filePresent";
+                    import { something as something1 } from "./filePresent";
+                    import { something2 } from "./fileNotFound";`,
+            },
+            {
+                path: `${projectRoot}/src/anotherFileReusingResolution.ts`,
+                content: Utils.dedent`
+                    import { something } from "./filePresent";
+                    import { something2 } from "./fileNotFound";`,
             },
             {
                 path: `${projectRoot}/src/filePresent.ts`,
