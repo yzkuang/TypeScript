@@ -3827,14 +3827,13 @@ namespace ts {
     /*@internal*/
     export interface IdentifierOfProgramFromBuildInfo {
         kind: SyntaxKind.Identifier;
-        escapedText: string;
+        escapedText: __String;
     }
 
     /*@internal*/
     export interface StringLiteralLikeOfProgramFromBuildInfo {
         kind: SyntaxKind.StringLiteral | SyntaxKind.NoSubstitutionTemplateLiteral;
         text: string;
-        escapedText: string;
     }
 
     /*@internal*/
@@ -3846,6 +3845,8 @@ namespace ts {
         originalFileName: string;
         path: Path;
         resolvedPath: Path;
+        // This currently is set to sourceFile.flags & NodeFlags.PermanentlySetIncrementalFlags but cant be set in type
+        // Change this if it changes in reusing program
         flags: NodeFlags;
         version: string;
 
@@ -3853,7 +3854,7 @@ namespace ts {
         libReferenceDirectives: readonly string[];
         referencedFiles: readonly string[];
         imports: readonly StringLiteralLikeOfProgramFromBuildInfo[];
-        moduleAugmentations: ModuleNameOfProgramFromBuildInfo[];
+        moduleAugmentations: readonly ModuleNameOfProgramFromBuildInfo[];
         ambientModuleNames: readonly string[];
         hasNoDefaultLib: boolean;
 
@@ -3866,22 +3867,21 @@ namespace ts {
 
         getCompilerOptions(): CompilerOptions;
         getRootFileNames(): readonly string[];
-        getSourceFiles(): SourceFileOfProgramFromBuildInfo[];
+        getSourceFiles(): readonly SourceFileOfProgramFromBuildInfo[];
         getSourceFileByPath(path: Path): SourceFileOfProgramFromBuildInfo | undefined;
         getPerFileModuleResolutions(): ESMap<Path, ESMap<string, ResolvedModuleWithFailedLookupLocations>>;
         getPerFileTypeReferenceResolutions(): ESMap<Path, ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>>;
         getProjectReferences(): readonly ProjectReference[] | undefined;
-        getResolvedProjectReferences(): readonly ResolvedProjectReferenceOfProgramFromBuildInfo[] | undefined;
+        getResolvedProjectReferences(): readonly (ResolvedProjectReferenceOfProgramFromBuildInfo | undefined)[] | undefined;
         getMissingFilePaths(): readonly Path[];
         getRefFileMap(): MultiMap<Path, RefFile> | undefined;
         getResolvedTypeReferenceDirectives(): ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>;
-        getFilesByNameMap(): ESMap<Path, Path | false | 0>;
+        getFilesByNameMap(): ESMap<Path, SourceFileOfProgramFromBuildInfo | Path | false | 0>;
         isSourceFileFromExternalLibraryPath(path: Path): boolean;
         getFileProcessingDiagnostics(): readonly ReusableDiagnostic[];
 
         redirectTargetsMap: MultiMap<Path, string>;
         sourceFileToPackageName: ESMap<Path, string>;
-        structureIsReused?: StructureIsReused;
     }
 
     /* @internal */

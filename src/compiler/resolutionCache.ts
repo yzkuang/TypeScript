@@ -25,7 +25,7 @@ namespace ts {
         clear(): void;
     }
 
-    interface ResolutionWithFailedLookupLocations {
+    export interface ResolutionWithFailedLookupLocations {
         readonly failedLookupLocations: string[];
         isInvalidated?: boolean;
         refCount?: number;

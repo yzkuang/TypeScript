@@ -1616,7 +1616,7 @@ namespace ts {
                     filesByName.set(newSourceFile.path, newSourceFile);
                 }
             });
-            const oldFilesByNameMap = oldProgram.getFilesByNameMap() as ESMap<Path, SourceFile | Path | false | 0>;
+            const oldFilesByNameMap = oldProgram.getFilesByNameMap() as ESMap<Path, SourceFileOfProgramFromBuildInfo | Path | false | 0>;
             oldFilesByNameMap.forEach((oldFile, path) => {
                 if (!oldFile) {
                     filesByName.set(path, oldFile as false | 0);
