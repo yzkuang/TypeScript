@@ -2833,6 +2833,7 @@ declare namespace ts {
         noUnusedParameters?: boolean;
         noImplicitUseStrict?: boolean;
         assumeChangesOnlyAffectDirectDependencies?: boolean;
+        assumeChangesAffectShape?: boolean;
         noLib?: boolean;
         noResolve?: boolean;
         noUncheckedIndexedAccess?: boolean;

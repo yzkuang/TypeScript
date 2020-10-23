@@ -4719,6 +4719,10 @@
         "code": 6385,
         "reportsDeprecated": true
     },
+    "Have recompiles in '--incremental' and '--watch' assume that any change to file can affect its shape resulting in affecting it's dependecies.": {
+        "category": "Message",
+        "code": 6386
+    },
 
     "The expected type comes from property '{0}' which is declared here on type '{1}'": {
         "category": "Message",
