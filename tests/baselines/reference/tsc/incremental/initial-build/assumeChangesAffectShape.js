@@ -66,17 +66,17 @@ exports.foo = foo;
       },
       "./extrafile.ts": {
         "version": "-13403012629-export const extra = 10;",
-        "signature": "-4859189518-export declare const extra = 10;\r\n",
+        "signature": "-13403012629-export const extra = 10;",
         "affectsGlobalScope": false
       },
       "./module.ts": {
         "version": "-8446458946-export function foo(): string { return \"hello\"; }",
-        "signature": "-8035635627-export declare function foo(): string;\r\n",
+        "signature": "-8446458946-export function foo(): string { return \"hello\"; }",
         "affectsGlobalScope": false
       },
       "./main.ts": {
         "version": "-7083766686-import { foo } from \"./module\";foo();",
-        "signature": "-4882119183-export {};\r\n",
+        "signature": "-7083766686-import { foo } from \"./module\";foo();",
         "affectsGlobalScope": false
       }
     },
@@ -91,7 +91,11 @@ exports.foo = foo;
         "./module.ts"
       ]
     },
-    "exportedModulesMap": {},
+    "exportedModulesMap": {
+      "./main.ts": [
+        "./module.ts"
+      ]
+    },
     "semanticDiagnosticsPerFile": [
       "../../lib/lib.d.ts",
       "./extrafile.ts",
@@ -116,6 +120,7 @@ Output::
 exitCode:: ExitStatus.Success
 
 
+//// [/src/project/main.js] file written with same contents
 //// [/src/project/module.js]
 "use strict";
 exports.__esModule = true;
@@ -135,17 +140,17 @@ exports.foo = foo;
       },
       "./extrafile.ts": {
         "version": "-13403012629-export const extra = 10;",
-        "signature": "-4859189518-export declare const extra = 10;\r\n",
+        "signature": "-13403012629-export const extra = 10;",
         "affectsGlobalScope": false
       },
       "./module.ts": {
         "version": "-4300970970-export function foo(): string { return \"hello world\"; }",
-        "signature": "-8035635627-export declare function foo(): string;\r\n",
+        "signature": "-4300970970-export function foo(): string { return \"hello world\"; }",
         "affectsGlobalScope": false
       },
       "./main.ts": {
         "version": "-7083766686-import { foo } from \"./module\";foo();",
-        "signature": "-4882119183-export {};\r\n",
+        "signature": "-7083766686-import { foo } from \"./module\";foo();",
         "affectsGlobalScope": false
       }
     },
@@ -160,7 +165,11 @@ exports.foo = foo;
         "./module.ts"
       ]
     },
-    "exportedModulesMap": {},
+    "exportedModulesMap": {
+      "./main.ts": [
+        "./module.ts"
+      ]
+    },
     "semanticDiagnosticsPerFile": [
       "../../lib/lib.d.ts",
       "./extrafile.ts",
@@ -206,17 +215,17 @@ exports.foo = foo;
       },
       "./extrafile.ts": {
         "version": "-13403012629-export const extra = 10;",
-        "signature": "-4859189518-export declare const extra = 10;\r\n",
+        "signature": "-13403012629-export const extra = 10;",
         "affectsGlobalScope": false
       },
       "./module.ts": {
         "version": "-1237933216-export const x = 10;export function foo(): string { return \"hello world\"; }",
-        "signature": "1387636182-export declare const x = 10;\r\nexport declare function foo(): string;\r\n",
+        "signature": "-1237933216-export const x = 10;export function foo(): string { return \"hello world\"; }",
         "affectsGlobalScope": false
       },
       "./main.ts": {
         "version": "-7083766686-import { foo } from \"./module\";foo();",
-        "signature": "-4882119183-export {};\r\n",
+        "signature": "-7083766686-import { foo } from \"./module\";foo();",
         "affectsGlobalScope": false
       }
     },
@@ -231,7 +240,11 @@ exports.foo = foo;
         "./module.ts"
       ]
     },
-    "exportedModulesMap": {},
+    "exportedModulesMap": {
+      "./main.ts": [
+        "./module.ts"
+      ]
+    },
     "semanticDiagnosticsPerFile": [
       "../../lib/lib.d.ts",
       "./extrafile.ts",

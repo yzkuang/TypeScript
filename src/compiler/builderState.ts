@@ -314,7 +314,7 @@ namespace ts {
 
             const prevSignature = info.signature;
             let latestSignature: string;
-            if (sourceFile.isDeclarationFile) {
+            if (sourceFile.isDeclarationFile || programOfThisState.getCompilerOptions().assumeChangesAffectShape) {
                 latestSignature = sourceFile.version;
                 if (exportedModulesMapCache && latestSignature !== prevSignature) {
                     // All the references in this file are exported
